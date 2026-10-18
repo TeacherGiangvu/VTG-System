@@ -1,0 +1,7 @@
+# Never commit secrets or data
+.clasprc.json
+.clasp.json
+*.csv
+*.xlsx
+.env
+node_modules/

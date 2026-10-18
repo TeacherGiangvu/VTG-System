@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>VTG CRM – Leads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<main>
+  <div class="row" style="justify-content:space-between;margin-bottom:.75rem">
+    <h1 style="margin:0">Leads</h1>
+    <a class="btn" href="lead.html">+ Add lead</a>
+  </div>
+  <div class="board" id="board"></div>
+</main>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+var u = VTG.boot('leads'), E = VTG.esc;
+if (u) {
+  Promise.all([VTG.api('options'), VTG.api('leads')]).then(function (r) {
+    var stages = r[0].stages, leads = r[1], today = new Date().toISOString().slice(0, 10);
+    document.getElementById('board').innerHTML = stages.map(function (s) {
+      var items = leads.filter(function (l) { return l.stage === s; });
+      return '<div class="col"><h3>' + E(s) + ' <span class="tag">' + items.length + '</span></h3>' + items.map(function (l) {
+        var late = l.next_followup && l.next_followup < today;
+        return '<a class="lead" href="lead.html?id=' + encodeURIComponent(l.id) + '"><b>' + E(l.name) + '</b>' +
+          '<small>' + E(l.source) + (l.owner ? ' · ' + E(l.owner) : '') + '</small>' +
+          (l.next_followup ? '<div><span class="tag' + (late ? ' late' : '') + '">' + E(l.next_followup) + '</span></div>' : '') + '</a>';
+      }).join('') + '</div>';
+    }).join('');
+  }).catch(function (e) { VTG.toast(e.message, true); });
+}
+</script>
+</body>
+</html>
